@@ -6,7 +6,16 @@ import model.ListaResultados;
 import model.Partida;
 
 public class RankingService {
-    private final RankingDAO dao = new RankingSQLiteDAO();
+    private final RankingDAO dao;
+
+    public RankingService() {
+        this(new RankingSQLiteDAO());
+    }
+
+    public RankingService(RankingDAO dao) {
+        this.dao = dao;
+        System.out.println("[RankingService] Usando: " + dao.getClass().getSimpleName());
+    }
 
     public void guardarRecord(String nombre, int racha) {
         dao.insertar(new Partida(nombre, racha));

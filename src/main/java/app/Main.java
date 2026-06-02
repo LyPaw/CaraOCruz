@@ -3,6 +3,7 @@ package app;
 import controller.JuegoController;
 import controller.MusicManager;
 import database.ConexionDB;
+import service.ClasificadorSGBD;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -29,6 +30,7 @@ public class Main extends Application {
     public void start(Stage v) {
         ConexionDB.crearTabla();
         MusicManager.iniciar();
+        ClasificadorSGBD.analizar();
 
         RadialGradient oro = new RadialGradient(0, 0.5, 0.5, 0.5, 0.5, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#8D8877")),
