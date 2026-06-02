@@ -11,11 +11,11 @@
 | `src/main/java/dao/RankingSQLiteDAO.java` | 41 |
 | `src/main/java/database/ConexionDB.java` | 20 |
 | `src/main/java/model/ListaResultados.java` | 16 |
-| `src/main/java/model/Partida.java` | 34 |
+| `src/main/java/model/Partida.java` | 21 |
 | `src/main/java/service/RankingService.java` | 33 |
 | `src/main/java/service/ClasificadorSGBD.java` | 28 |
 | `src/test/java/BackendTest.java` | 54 |
-| **Total** | **490** |
+| **Total** | **477** |
 
 ## Índice
 
@@ -582,10 +582,7 @@ public static void detener() {
 **Rol:** Clase que representa una partida guardada en el ranking.
 
 ```java
-@Entity
-public class Partida implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class Partida {
     private Long id;
     private String nombre;
     private int racha;
