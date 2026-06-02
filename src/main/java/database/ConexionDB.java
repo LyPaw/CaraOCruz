@@ -3,20 +3,18 @@ package database;
 import java.sql.*;
 
 public class ConexionDB {
+    private static String url = "jdbc:sqlite:ranking.db";
 
-    private static String urlBaseDatos = "jdbc:sqlite:ranking.db";
-
-    public static void setUrlBaseDatos(String url) { urlBaseDatos = url; }
-    public static Connection obtenerConexion() throws SQLException { return DriverManager.getConnection(urlBaseDatos); }
+    public static Connection obtenerConexion() throws SQLException {
+        return DriverManager.getConnection(url);
+    }
 
     public static void crearTabla() {
-        String sql = "CREATE TABLE IF NOT EXISTS ranking (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "nombre TEXT NOT NULL, " +
-                "monedas_finales INTEGER NOT NULL, " +
-                "fecha TEXT NOT NULL)";
-        try (Connection conexion = obtenerConexion(); Statement stmt = conexion.createStatement()) {
-            stmt.execute(sql);
-        } catch (SQLException e) { System.err.println("Error creando tabla ranking: " + e.getMessage()); }
+        try (Connection c = obtenerConexion();
+             Statement st = c.createStatement()) {
+            st.execute("CREATE TABLE IF NOT EXISTS ranking (" +
+                       "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                       "nombre TEXT NOT NULL, racha INTEGER NOT NULL)");
+        } catch (SQLException e) { System.err.println("Error BD: " + e.getMessage()); }
     }
 }

@@ -1,0 +1,9 @@
+.boton-juego {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0, 0, 3);
+}
+.boton-juego:hover {
+    -fx-text-fill: black;
+}

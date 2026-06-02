@@ -3,12 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.tutorial</groupId>
-    <artifactId>blackjack21</artifactId>
+    <groupId>app</groupId>
+    <artifactId>caraocruz</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Blackjack 21 - Siete y Media</name>
+    <name>Cara o Cruz</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -110,7 +110,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.blackjack.app.Juego21App</mainClass>
+                    <mainClass>app.Main</mainClass>
                 </configuration>
             </plugin>
             <!-- Ejecuta via 'mvn exec:exec@run' o run.ps1 -->
@@ -131,7 +131,7 @@
                                 <argument>--add-modules=javafx.controls,javafx.media</argument>
                                 <argument>-cp</argument>
                                 <argument>${project.build.directory}/classes${path.separator}${project.build.directory}/lib/*</argument>
-                                <argument>com.blackjack.app.Juego21App</argument>
+                                <argument>app.Main</argument>
                             </arguments>
                             <workingDirectory>${project.basedir}</workingDirectory>
                         </configuration>

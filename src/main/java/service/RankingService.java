@@ -1,20 +1,31 @@
 package service;
 
 import dao.RankingDAO;
-import dao.RankingDAOImpl;
-import model.JugadorRanking;
-import java.time.LocalDate;
-import java.util.List;
+import dao.RankingSQLiteDAO;
+import model.ListaResultados;
+import model.Partida;
 
 public class RankingService {
+    private final RankingDAO dao = new RankingSQLiteDAO();
 
-    private final RankingDAO rankingDAO;
-
-    public RankingService() { this.rankingDAO = new RankingDAOImpl(); }
-
-    public void guardarRecord(String nombre, int monedasFinales) {
-        rankingDAO.insertar(new JugadorRanking(nombre, monedasFinales, LocalDate.now()));
+    public void guardarRecord(String nombre, int racha) {
+        dao.insertar(new Partida(nombre, racha));
     }
 
-    public List<JugadorRanking> obtenerRanking() { return rankingDAO.obtenerTop5(); }
+    public void guardarSiMejor(String nombre, int racha) {
+        if (racha > obtenerMejorRacha(nombre)) {
+            dao.insertar(new Partida(nombre, racha));
+        }
+    }
+
+    public int obtenerMejorRacha(String nombre) {
+        return dao.obtenerMejorRacha(nombre);
+    }
+
+    public ListaResultados<Partida> obtenerRanking() {
+        ListaResultados<Partida> lr = new ListaResultados<>();
+        dao.obtenerTop5().forEach(lr::añadir);
+        System.out.println("Suma total de rachas TOP5: " + lr.sumar(Partida::getRacha));
+        return lr;
+    }
 }

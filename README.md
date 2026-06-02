@@ -1,76 +1,86 @@
-# Blackjack 21
-
-Juego de Blackjack desarrollado en **JavaFX 21** con arquitectura **MVC + DAO** y persistencia en **SQLite**.
+# Cara o Cruz
 
 <p align="center">
-  <img src="src/main/resources/logo/logo.png" alt="Blackjack 21" width="600">
+  <img src="src/main/resources/img/cara.png" alt="Cara o Cruz" width="200">
 </p>
 
-## Requisitos
+Juego de **Cara o Cruz** (heads or tails) desarrollado en **JavaFX**. El jugador introduce su nombre, elige CARA o CRUZ, y la moneda se lanza animadamente con un efecto de giro 3D. El objetivo es conseguir la racha más larga posible. Las puntuaciones se guardan de forma persistente y se muestra un ranking de las 5 mejores rachas.
 
-- **JDK 17 o superior** (recomendado JDK 21+)
-- **Maven 3.9+**
-- Sistema operativo: Windows, Linux o macOS
+---
 
-## Compilar y ejecutar
+## Características
 
-```bash
-# Con Maven (descarga JavaFX automaticamente)
-mvn clean package
-mvn javafx:run
+- **Animación 3D de la moneda** — Efecto de compresión (`ScaleTransition`) con parpadeo sincronizado de las caras para simular el giro
+- **Interfaz gráfica completa (JavaFX)** — Pantalla completa, botones con estilos, sombras dinámicas que cambian de color según acierto o fallo
+- **Entrada por consola** — El nombre del jugador se solicita al arrancar mediante `Scanner`
+- **Salida formateada** — Uso de `printf` y `String.format` para mostrar resultados y ranking con formato tabulado
+- **Genéricos** — Clase `ListaResultados<T extends Partida>` con método genérico `sumar(ToIntFunction<? super T>)`
+- **Streams y operaciones agregadas** — `stream().mapToInt().sum()`, `stream().sorted().limit(5).collect()`, `stream().filter().mapToInt().max()`, `stream().map().toList()` en múltiples archivos
+- **Arquitectura basada en interfaces** — `RankingDAO` define el contrato de persistencia; `RankingSQLiteDAO` y `RankingSerialDAO` son implementaciones intercambiables
+- **Base de datos SQLite** — Persistencia mediante JDBC con tabla `ranking` (id, nombre, racha). La tabla se crea automáticamente al iniciar
+- **Ranking persistente** — Top 5 de mejores rachas visible en un `ListView` y también por consola
+- **Música de fondo** — Reproducción continua de un archivo WAV con `MediaPlayer`
 
-# O con scripts de Windows (sin restricciones de PowerShell)
-.\run.bat              # CMD - doble clic, funciona en cualquier equipo
+---
 
-# Con PowerShell (si la politica de ejecucion lo permite)
-.\run.ps1
-```
+## Tecnologías
+
+| Tecnología | Versión |
+|------------|---------|
+| Java | 21 |
+| JavaFX | 21 |
+| SQLite (JDBC) | 3.45.1 |
+| Maven | 3.x |
+| JUnit | 5.10 |
+
+---
 
 ## Estructura del proyecto
 
 ```
-src/
-├── main/java/
-│   ├── com/blackjack/app/
-│   │   └── Juego21App.java          # Punto de entrada (JavaFX Application)
-│   ├── controller/
-│   │   ├── JuegoController.java     # Logica del juego
-│   │   └── MusicManager.java        # Gestion de musica y efectos
-│   ├── model/
-│   │   ├── Carta.java               # Modelo de carta
-│   │   └── JugadorRanking.java      # Modelo de registro de ranking
-│   ├── database/
-│   │   └── ConexionDB.java          # Conexion a SQLite (ranking.db)
-│   ├── dao/
-│   │   ├── RankingDAO.java          # Interfaz DAO
-│   │   └── RankingDAOImpl.java      # Implementacion SQLite
-│   ├── service/
-│   │   └── RankingService.java      # Capa de servicio
-│   └── view/
-│       └── RankingView.java         # UI de ranking y registro
-├── main/resources/
-│   ├── image/                       # 52 cartas PNG (2C.png ... AS.png)
-│   ├── logo/                        # logo.png
-│   └── sound/                       # barajar.wav, musica_fondo.wav
-└── test/java/
-    └── BackendTest.java             # 10 tests unitarios (JUnit 5)
+src/main/java/
+├── app/Main.java                        ← Punto de entrada (Application)
+├── controller/
+│   ├── JuegoController.java             ← Lógica del juego, animaciones, eventos
+│   └── MusicManager.java               ← Reproductor de música de fondo
+├── dao/
+│   ├── RankingDAO.java                 ← Interfaz de persistencia
+│   ├── RankingSerialDAO.java           ← Implementación con serialización
+│   └── RankingSQLiteDAO.java           ← Implementación con SQLite
+├── database/
+│   └── ConexionDB.java                 ← Conexión JDBC a SQLite
+├── model/
+│   ├── ListaResultados.java            ← Contenedor genérico con operaciones agregadas
+│   └── Partida.java                    ← Modelo de datos (Serializable)
+└── service/
+    └── RankingService.java             ← Capa de negocio
+
+src/main/resources/
+├── css/estilo.css                      ← Estilos de los botones
+├── img/
+│   ├── cara.png                        ← Imagen CARA
+│   └── cruz.png                        ← Imagen CRUZ
+└── sound/
+    └── musica_fondo.wav                ← Música de fondo
 ```
 
-## Caracteristicas
+---
 
-- Baraja completa de 52 cartas con valores de Blackjack
-- As flexible (vale 11 o 1 segun convenga)
-- Musica de fondo y efecto de sonido al barajar
-- Control de volumen integrado
-- Puntuacion de la banca visible con cartas graficas
-- Ranking persistente en SQLite (TOP 5)
-- Dialogos superpuestos (no minimizan la pantalla completa)
-- Pantalla completa
-
-## Testing
+## Cómo ejecutar
 
 ```bash
-mvn test
+mvn javafx:run
 ```
 
-Los 10 tests unitarios cubren modelo, DAO y servicio.
+Al arrancar se pedirá el nombre del jugador por consola. Después se abre la ventana del juego en pantalla completa.
+
+---
+
+## Cómo jugar
+
+1. Introduce tu nombre al iniciar
+2. Pulsa **CARA** o **CRUZ** para lanzar la moneda
+3. La moneda gira y muestra el resultado
+4. Si aciertas, la racha aumenta; si fallas, se reinicia
+5. Pulsa **VER RANKING** para ver las mejores rachas guardadas
+6. Tu mejor racha se guarda automáticamente al fallar si supera tu récord anterior

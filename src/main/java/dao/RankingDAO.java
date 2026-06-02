@@ -1,9 +1,10 @@
 package dao;
 
-import model.JugadorRanking;
+import model.Partida;
 import java.util.List;
 
 public interface RankingDAO {
-    void insertar(JugadorRanking jugador);
-    List<JugadorRanking> obtenerTop5();
+    void insertar(Partida p);
+    List<Partida> obtenerTop5();
+    int obtenerMejorRacha(String nombre);
 }

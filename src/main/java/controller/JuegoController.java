@@ -1,184 +1,91 @@
 package controller;
 
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
+import javafx.animation.KeyFrame;
+import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import model.Carta;
+import javafx.util.Duration;
 import service.RankingService;
-import view.RankingView;
-
-import java.util.*;
+import java.util.Random;
 
 public class JuegoController {
+    private final StackPane moneda;
+    private final ImageView estrella, cruzFig;
+    private final ListView<String> ranking;
+    private final Button cara, cruz, verR;
+    private final String nombre;
+    private final Random rand = new Random();
+    private int rachaActual = 0;
+    private final RankingService service = new RankingService();
+    private boolean animando = false;
 
-    private static final int APUESTA = 100;
-    private static final int MONEDAS_INICIALES = 1000;
-    private static final int BANCA_SE_PLANTA = 17;
-
-    private int monedasActuales = MONEDAS_INICIALES;
-    private int puntuacionActual = 0;
-    private int puntuacionBanca = 0;
-    private List<Carta> baraja;
-    private List<Carta> cartasJugador;
-    private List<Carta> cartasBanca;
-    private boolean manoActiva = false;
-
-    private final Label etiquetaMonedas;
-    private final Label etiquetaPuntuacion;
-    private final Label etiquetaEstado;
-    private final Label etiquetaBanca;
-    private final HBox contenedorCartas;
-    private final HBox contenedorCartasBanca;
-    private final Button botonPedir;
-    private final Button botonPlantarse;
-    private final Button botonReiniciar;
-    private final Button botonRegistrar;
-    private final Button botonVerRanking;
-
-    private final RankingView rankingView;
-
-    public JuegoController(StackPane raiz,
-                           Label etiquetaMonedas, Label etiquetaPuntuacion,
-                           Label etiquetaEstado, Label etiquetaBanca,
-                           HBox contenedorCartas, HBox contenedorCartasBanca,
-                           Button botonPedir, Button botonPlantarse,
-                           Button botonReiniciar, Button botonRegistrar,
-                           Button botonVerRanking) {
-        this.etiquetaMonedas = etiquetaMonedas;
-        this.etiquetaPuntuacion = etiquetaPuntuacion;
-        this.etiquetaEstado = etiquetaEstado;
-        this.etiquetaBanca = etiquetaBanca;
-        this.contenedorCartas = contenedorCartas;
-        this.contenedorCartasBanca = contenedorCartasBanca;
-        this.botonPedir = botonPedir;
-        this.botonPlantarse = botonPlantarse;
-        this.botonReiniciar = botonReiniciar;
-        this.botonRegistrar = botonRegistrar;
-        this.botonVerRanking = botonVerRanking;
-        this.rankingView = new RankingView(raiz, new RankingService());
-        this.cartasJugador = new ArrayList<>();
-        this.cartasBanca = new ArrayList<>();
-        this.baraja = new ArrayList<>();
+    public JuegoController(StackPane moneda, ImageView estrella, ImageView cruzFig,
+                           ListView<String> ranking, Button cara, Button cruz,
+                           Button verR, String nombre) {
+        this.moneda = moneda; this.estrella = estrella; this.cruzFig = cruzFig;
+        this.ranking = ranking; this.cara = cara; this.cruz = cruz;
+        this.verR = verR; this.nombre = nombre;
     }
 
-    private void inicializarBaraja() {
-        baraja = new ArrayList<>();
-        String[] palos = {"C", "D", "H", "S"};
-        String[] caras = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
-        int[] valores = {2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11};
-        for (String palo : palos)
-            for (int i = 0; i < caras.length; i++)
-                baraja.add(new Carta(palo, valores[i], caras[i] + palo + ".png"));
-        Collections.shuffle(baraja);
-        MusicManager.reproducirSonidoBarajar();
-    }
+    public void jugar(String eleccion) {
+        if (animando) return;
+        animando = true;
+        cara.setDisable(true); cruz.setDisable(true);
 
-    private int calcularPuntuacion(List<Carta> cartas) {
-        int total = 0;
-        int aces = 0;
-        for (Carta c : cartas) {
-            int valor = c.obtenerPuntuacion();
-            total += valor;
-            if (valor == 11) aces++;
+        String resultado = rand.nextBoolean() ? "CARA" : "CRUZ";
+
+        ScaleTransition squish = new ScaleTransition(Duration.millis(600), moneda);
+        squish.setToY(0.01);
+
+        Timeline spin = new Timeline();
+        for (int i = 0; i < 10; i++) {
+            boolean mostrar = i % 2 == 0;
+            spin.getKeyFrames().add(new KeyFrame(Duration.millis(65 * i), e -> {
+                estrella.setVisible(mostrar);
+                cruzFig.setVisible(!mostrar);
+            }));
         }
-        while (total > 21 && aces > 0) {
-            total -= 10;
-            aces--;
-        }
-        return total;
+
+        spin.setOnFinished(e -> {
+            squish.stop();
+            boolean ok = eleccion.equals(resultado);
+            estrella.setVisible(resultado.equals("CARA"));
+            cruzFig.setVisible(resultado.equals("CRUZ"));
+            moneda.setEffect(new DropShadow(15, 3, 3, ok ? Color.web("#4CAF50", 0.6) : Color.web("#F44336", 0.6)));
+
+            ScaleTransition expand = new ScaleTransition(Duration.millis(300), moneda);
+            expand.setToY(1);
+            expand.setOnFinished(e2 -> {
+                if (ok) {
+                    rachaActual++;
+                } else {
+                    if (rachaActual > 0) service.guardarSiMejor(nombre, rachaActual);
+                    rachaActual = 0;
+                }
+                System.out.printf("[%s] %s -> %s %s (racha:%d)%n", nombre, eleccion, resultado, ok ? "OK" : "X", rachaActual);
+                ranking.getItems().setAll(service.obtenerRanking().getItems().stream()
+                    .map(p -> String.format("%s - %d", p.getNombre(), p.getRacha())).toList());
+                cara.setDisable(false); cruz.setDisable(false);
+                animando = false;
+            });
+            expand.play();
+        });
+
+        squish.play();
+        spin.play();
     }
 
-    private void mostrarCartaEn(Carta carta, HBox contenedor) {
-        java.net.URL url = getClass().getResource("/image/" + carta.getNombreArchivoImagen());
-        if (url == null) return;
-        ImageView vista = new ImageView(new Image(url.toString()));
-        vista.setFitHeight(200);
-        vista.setPreserveRatio(true);
-        contenedor.getChildren().add(vista);
+    public void mostrarRanking() {
+        var lr = service.obtenerRanking();
+        StringBuilder sb = new StringBuilder("=== TOP 5 RANKING ===\n");
+        lr.getItems().forEach(p -> sb.append(String.format("%-18s %d racha%n", p.getNombre(), p.getRacha())));
+        System.out.print(sb);
+        ranking.getItems().setAll(lr.getItems().stream()
+            .map(p -> String.format("%s - %d", p.getNombre(), p.getRacha())).toList());
     }
-
-    public void prepararNuevaMano() {
-        puntuacionActual = 0;
-        puntuacionBanca = 0;
-        cartasJugador = new ArrayList<>();
-        cartasBanca = new ArrayList<>();
-        contenedorCartas.getChildren().clear();
-        contenedorCartasBanca.getChildren().clear();
-        etiquetaPuntuacion.setText("0");
-        etiquetaBanca.setText("Banca: ?");
-        etiquetaEstado.setText("Nueva mano - pide una carta");
-        inicializarBaraja();
-        botonPedir.setDisable(false);
-        botonPlantarse.setDisable(false);
-        botonReiniciar.setDisable(true);
-        manoActiva = true;
-    }
-
-    public void reiniciarPartida() {
-        monedasActuales = MONEDAS_INICIALES;
-        etiquetaMonedas.setText(String.valueOf(monedasActuales));
-        prepararNuevaMano();
-        botonRegistrar.setDisable(false);
-    }
-
-    public void pedirCarta() {
-        if (!manoActiva) {
-            if (monedasActuales <= 0) return;
-            prepararNuevaMano();
-        }
-        if (baraja.isEmpty()) return;
-        Carta carta = baraja.remove(0);
-        cartasJugador.add(carta);
-        mostrarCartaEn(carta, contenedorCartas);
-        puntuacionActual = calcularPuntuacion(cartasJugador);
-        etiquetaPuntuacion.setText(String.valueOf(puntuacionActual));
-        if (puntuacionActual > 21) {
-            etiquetaEstado.setText("Te pasaste de 21! Perdiste.");
-            monedasActuales -= APUESTA;
-            etiquetaMonedas.setText(String.valueOf(monedasActuales));
-            finalizarMano();
-        }
-    }
-
-    public void plantarse() {
-        if (!manoActiva) return;
-        botonPedir.setDisable(true);
-        botonPlantarse.setDisable(true);
-        while (puntuacionBanca < BANCA_SE_PLANTA && !baraja.isEmpty()) {
-            Carta carta = baraja.remove(0);
-            cartasBanca.add(carta);
-            mostrarCartaEn(carta, contenedorCartasBanca);
-            puntuacionBanca = calcularPuntuacion(cartasBanca);
-        }
-        etiquetaBanca.setText("Banca: " + puntuacionBanca + " pts");
-        if (puntuacionBanca > 21 || puntuacionActual > puntuacionBanca) {
-            etiquetaEstado.setText("Ganaste! (+" + APUESTA + ")");
-            monedasActuales += APUESTA;
-        } else if (puntuacionActual == puntuacionBanca) {
-            etiquetaEstado.setText("Empate. Recuperas tu apuesta.");
-        } else {
-            etiquetaEstado.setText("Banca gana. (-" + APUESTA + ")");
-            monedasActuales -= APUESTA;
-        }
-        etiquetaMonedas.setText(String.valueOf(monedasActuales));
-        finalizarMano();
-    }
-
-    private void finalizarMano() {
-        manoActiva = false;
-        botonPlantarse.setDisable(true);
-        botonReiniciar.setDisable(false);
-        if (monedasActuales <= 0) {
-            botonPedir.setDisable(true);
-            botonRegistrar.setDisable(false);
-            etiquetaEstado.setText("Sin monedas! Registra tu record o reinicia.");
-        } else {
-            botonPedir.setDisable(false);
-            etiquetaEstado.setText(etiquetaEstado.getText() + " Pulsa 'Pedir Carta' para seguir.");
-        }
-    }
-
-    public void registrarPuntuacion() { rankingView.registrarPuntuacion(monedasActuales); }
-    public void verRanking() { rankingView.mostrarRanking(); }
 }
