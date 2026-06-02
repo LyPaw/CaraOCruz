@@ -1,5 +1,25 @@
 # Documentación completa — Cara o Cruz
 
+## Líneas de código por archivo
+
+| Archivo | Líneas |
+|---------|-------:|
+| `src/main/java/app/Main.java` | 103 |
+| `src/main/java/controller/JuegoController.java` | 91 |
+| `src/main/java/controller/MusicManager.java` | 23 |
+| `src/main/java/dao/RankingDAO.java` | 10 |
+| `src/main/java/dao/RankingSQLiteDAO.java` | 41 |
+| `src/main/java/dao/RankingSerialDAO.java` | 45 |
+| `src/main/java/database/ConexionDB.java` | 20 |
+| `src/main/java/model/ListaResultados.java` | 16 |
+| `src/main/java/model/Partida.java` | 16 |
+| `src/main/java/service/RankingService.java` | 31 |
+| `src/main/resources/css/estilo.css` | 9 |
+| `src/test/java/BackendTest.java` | 63 |
+| `pom.xml` | 143 |
+| `README.md` | 86 |
+| **Total** | **1869** |
+
 ## Índice
 
 1. [Estructura del proyecto](#estructura-del-proyecto)
