@@ -9,16 +9,13 @@
 | `src/main/java/controller/MusicManager.java` | 23 |
 | `src/main/java/dao/RankingDAO.java` | 10 |
 | `src/main/java/dao/RankingSQLiteDAO.java` | 41 |
-| `src/main/java/dao/RankingSerialDAO.java` | 45 |
-| `src/main/java/dao/RankingObjectDBDAO.java` | 46 |
 | `src/main/java/database/ConexionDB.java` | 20 |
-| `src/main/java/database/ObjectDBManager.java` | 17 |
 | `src/main/java/model/ListaResultados.java` | 16 |
 | `src/main/java/model/Partida.java` | 34 |
 | `src/main/java/service/RankingService.java` | 33 |
-| `src/main/java/service/ClasificadorSGBD.java` | 86 |
-| `src/test/java/BackendTest.java` | 63 |
-| **Total** | **639** |
+| `src/main/java/service/ClasificadorSGBD.java` | 28 |
+| `src/test/java/BackendTest.java` | 54 |
+| **Total** | **490** |
 
 ## Índice
 
@@ -31,16 +28,13 @@
 7. [model.ListaResultados — Contenedor genérico](#modellistaresultados--contenedor-genérico)
 8. [dao.RankingDAO — Interfaz de persistencia](#daorankingdao--interfaz-de-persistencia)
 9. [dao.RankingSQLiteDAO — Implementación SQLite](#daorankingsqlitedao--implementación-sqlite)
-10. [dao.RankingSerialDAO — Implementación serialización](#daorankingserialdao--implementación-serialización)
-11. [dao.RankingObjectDBDAO — Implementación ObjectDB](#daorankingobjectdbdao--implementación-objectdb)
-12. [database.ConexionDB — Conexión a SQLite](#databaseconexiondb--conexión-a-sqlite)
-13. [database.ObjectDBManager — Conexión a ObjectDB](#databaseobjectdbmanager--conexión-a-objectdb)
-14. [service.RankingService — Capa de negocio](#servicerankingservice--capa-de-negocio)
-15. [service.ClasificadorSGBD — Clasificación de SGBD](#serviceclasificadorsgbd--clasificación-de-sgbd)
-16. [css/estilo.css — Estilos visuales](#cssestilocss--estilos-visuales)
-17. [BackendTest — Tests unitarios](#backendtest--tests-unitarios)
-18. [Flujo completo de ejecución](#flujo-completo-de-ejecución)
-19. [Diagrama de dependencias](#diagrama-de-dependencias)
+10. [database.ConexionDB — Conexión a SQLite](#databaseconexiondb--conexión-a-sqlite)
+11. [service.RankingService — Capa de negocio](#servicerankingservice--capa-de-negocio)
+12. [service.ClasificadorSGBD — Clasificación de SGBD](#serviceclasificadorsgbd--clasificación-de-sgbd)
+13. [css/estilo.css — Estilos visuales](#cssestilocss--estilos-visuales)
+14. [BackendTest — Tests unitarios](#backendtest--tests-unitarios)
+15. [Flujo completo de ejecución](#flujo-completo-de-ejecución)
+16. [Diagrama de dependencias](#diagrama-de-dependencias)
 
 ---
 
@@ -57,12 +51,9 @@ src/
 │   │   │   └── MusicManager.java             ← Gestor de música
 │   │   ├── dao/
 │   │   │   ├── RankingDAO.java               ← Interfaz DAO
-│   │   │   ├── RankingSerialDAO.java         ← DAO con serialización
-│   │   │   ├── RankingSQLiteDAO.java         ← DAO con SQLite
-│   │   │   └── RankingObjectDBDAO.java       ← DAO con ObjectDB
+│   │   │   └── RankingSQLiteDAO.java         ← DAO con SQLite
 │   │   ├── database/
-│   │   │   ├── ConexionDB.java               ← Conexión JDBC a SQLite
-│   │   │   └── ObjectDBManager.java          ← Conexión JPA a ObjectDB
+│   │   │   └── ConexionDB.java               ← Conexión JDBC a SQLite
 │   │   ├── model/
 │   │   │   ├── ListaResultados.java           ← Colección genérica
 │   │   │   └── Partida.java                   ← Modelo de datos
@@ -70,8 +61,6 @@ src/
 │   │       ├── RankingService.java            ← Lógica de negocio
 │   │       └── ClasificadorSGBD.java          ← Clasificación de SGBD
 │   └── resources/
-│       ├── META-INF/
-│       │   └── persistence.xml                ← Configuración JPA para ObjectDB
 │       ├── css/
 │       │   └── estilo.css                     ← Estilos JavaFX
 │       ├── img/
@@ -115,16 +104,7 @@ Java 17 es la versión mínima de compilación. JavaFX 21 es la versión de la b
 | `javafx-graphics` | 21 | Renderizado gráfico (con clasificador de plataforma) |
 | `javafx-media` | 21 | Reproducción de audio (WAV) |
 | `sqlite-jdbc` | 3.45.3.0 | Driver JDBC para conectar con SQLite (SGBDR) |
-| `objectdb` | 2.8.9 | ObjectDB — Sistema Gestor de BD Orientada a Objetos (OODBMS) |
 | `junit-jupiter` | 5.11.0 | Tests unitarios (solo en test) |
-
-**Nota:** ObjectDB requiere un repositorio Maven adicional configurado en `<repositories>`:
-```xml
-<repository>
-    <id>objectdb</id>
-    <url>https://m2.objectdb.com</url>
-</repository>
-```
 
 ### Plugins de build
 
@@ -193,7 +173,7 @@ ClasificadorSGBD.analizar();
 
 - `ConexionDB.crearTabla()` → Crea la tabla `ranking` en SQLite si no existe (ver sección ConexionDB).
 - `MusicManager.iniciar()` → Carga y reproduce el archivo WAV de música de fondo en bucle infinito.
-- `ClasificadorSGBD.analizar()` → Imprime por consola la clasificación y comparación de los 3 sistemas de persistencia (SQLite, ObjectDB, Serialización), satisfaciendo el análisis de métodos de SGBD.
+- `ClasificadorSGBD.analizar()` → Imprime por consola la clasificación de SQLite como sistema de persistencia relacional.
 
 #### Gradiente de la moneda
 
@@ -599,7 +579,7 @@ public static void detener() {
 
 ## model.Partida — Modelo de datos
 
-**Rol:** Clase que representa una partida guardada en el ranking. Es una entidad JPA compatible con ObjectDB y serializable para `RankingSerialDAO`.
+**Rol:** Clase que representa una partida guardada en el ranking.
 
 ```java
 @Entity
@@ -626,15 +606,10 @@ public class Partida implements Serializable {
 }
 ```
 
-**Anotaciones JPA:**
-- `@Entity`: Marca la clase como entidad persistible para ObjectDB (JPA)
-- `@Id`: Define el campo `id` como clave primaria en la base de datos
-- `@GeneratedValue(strategy = GenerationType.IDENTITY)`: El ID se genera automáticamente
-
-**Significado:**
-- `Serializable`: Permite serialización para `RankingSerialDAO`
-- Constructor vacío `Partida()`: Requerido por JPA para crear instancias al recuperar de BD
-- Getters y Setters: Requeridos por JPA para acceso a campos persistentes
+**Campos:**
+- `id` (Long): Identificador único, generado automáticamente
+- `nombre` (String): Nombre del jugador
+- `racha` (int): Racha de aciertos consecutivos
 
 ---
 
@@ -690,8 +665,7 @@ public interface RankingDAO {
 
 **Ventajas de usar interfaz:**
 1. **Desacoplamiento**: `RankingService` trabaja contra la interfaz, no contra una implementación concreta
-2. **Intercambiabilidad**: Podemos cambiar de SQLite a serialización (o cualquier otro sistema) sin modificar el servicio
-3. **Testabilidad**: Podemos crear implementaciones mock para pruebas
+2. **Testabilidad**: Podemos crear implementaciones mock para pruebas
 
 ---
 
@@ -780,208 +754,6 @@ public int obtenerMejorRacha(String nombre) {
 
 ---
 
-## dao.RankingSerialDAO — Implementación serialización
-
-**Rol:** Implementa `RankingDAO` usando serialización Java para almacenar los datos en un archivo binario (`ranking_oo.dat`).
-
-### Campo
-
-```java
-private static final String FICHERO = "ranking_oo.dat";
-```
-
-Nombre del archivo donde se guardan los datos. `static final` = constante de clase.
-
-### Método `insertar(Partida p)`
-
-```java
-@Override
-public void insertar(Partida p) {
-    List<Partida> lista = leerTodos();
-    lista.add(p);
-    escribirTodos(lista);
-}
-```
-
-**Propósito:** Añade una partida al archivo. Lee todas las existentes, añade la nueva y las vuelve a escribir todas (no hay inserción directa como en SQL).
-
-### Método `obtenerTop5()`
-
-```java
-@Override
-public List<Partida> obtenerTop5() {
-    return leerTodos().stream()
-            .sorted(Comparator.comparingInt(Partida::getRacha).reversed())
-            .limit(5).collect(Collectors.toList());
-}
-```
-
-**Propósito:** Filtra y ordena en memoria usando streams:
-1. `leerTodos()` → lista completa
-2. `.stream()` → flujo de datos
-3. `.sorted(Comparator.comparingInt(Partida::getRacha).reversed())` → ordena por racha descendente
-4. `.limit(5)` → toma solo las 5 primeras
-5. `.collect(Collectors.toList())` → convierte el flujo de vuelta a lista
-
-### Método `obtenerMejorRacha(String nombre)`
-
-```java
-@Override
-public int obtenerMejorRacha(String nombre) {
-    return leerTodos().stream()
-            .filter(p -> p.getNombre().equals(nombre))
-            .mapToInt(Partida::getRacha)
-            .max().orElse(0);
-}
-```
-
-**Propósito:** Filtra las partidas del jugador, extrae las rachas, encuentra el máximo y si no hay ninguna devuelve 0.
-
-### Método privado `leerTodos()`
-
-```java
-@SuppressWarnings("unchecked")
-private List<Partida> leerTodos() {
-    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FICHERO))) {
-        return (List<Partida>) ois.readObject();
-    } catch (Exception e) { return new ArrayList<>(); }
-}
-```
-
-**Propósito:** Deserializa la lista completa desde el archivo binario.
-
-**Detalles técnicos:**
-- `ObjectInputStream`: Lee objetos Java desde un flujo binario
-- `FileInputStream`: Lee bytes desde un archivo
-- `readObject()`: Deserializa el objeto (devuelve `Object`, hay que castear)
-- `@SuppressWarnings("unchecked")`: Suprime la advertencia por el cast potencialmente inseguro
-- Si falla (archivo no existe, formato incorrecto), captura la excepción y devuelve lista vacía
-
-### Método privado `escribirTodos(List<Partida> lista)`
-
-```java
-private void escribirTodos(List<Partida> lista) {
-    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FICHERO))) {
-        oos.writeObject(lista);
-    } catch (Exception e) {
-        System.err.println("Error guardando: " + e.getMessage());
-    }
-}
-```
-
-**Propósito:** Serializa la lista completa al archivo binario.
-
-**Detalles técnicos:**
-- `ObjectOutputStream`: Escribe objetos Java a un flujo binario
-- `FileOutputStream`: Escribe bytes a un archivo
-- `writeObject(lista)`: Serializa la lista entera (requiere que `Partida` implemente `Serializable`)
-- Si falla (permisos, espacio), muestra el error pero no interrumpe la ejecución
-
----
-
-## dao.RankingObjectDBDAO — Implementación ObjectDB
-
-**Rol:** Implementa `RankingDAO` usando **ObjectDB**, un Sistema Gestor de Bases de Datos Orientado a Objetos (OODBMS). Almacena objetos Java directamente mediante JPA (Java Persistence API).
-
-### Dependencia
-
-```xml
-<dependency>
-    <groupId>com.objectdb</groupId>
-    <artifactId>objectdb</artifactId>
-    <version>2.8.9</version>
-</dependency>
-```
-
-ObjectDB requiere el repositorio Maven `https://m2.objectdb.com`.
-
-### Método `insertar(Partida p)`
-
-```java
-@Override
-public void insertar(Partida p) {
-    EntityManager em = ObjectDBManager.obtenerConexion();
-    try {
-        em.getTransaction().begin();
-        em.persist(p);
-        em.getTransaction().commit();
-    } finally {
-        em.close();
-    }
-}
-```
-
-**Propósito:** Persiste un objeto `Partida` directamente en la base de datos ObjectDB.
-
-**Detalles técnicos:**
-- `EntityManager`: Interfaz principal de JPA para operaciones de persistencia
-- `getTransaction().begin()`: Inicia una transacción ACID
-- `em.persist(p)`: Almacena el objeto Java directamente (no hay tabla SQL, no hay INSERT)
-- `em.getTransaction().commit()`: Confirma la transacción
-- `em.close()` en `finally`: Libera recursos incluso si hay error
-
-### Método `obtenerTop5()`
-
-```java
-@Override
-public List<Partida> obtenerTop5() {
-    EntityManager em = ObjectDBManager.obtenerConexion();
-    try {
-        TypedQuery<Partida> q = em.createQuery(
-            "SELECT p FROM Partida p ORDER BY p.racha DESC", Partida.class);
-        q.setMaxResults(5);
-        return q.getResultList();
-    } finally {
-        em.close();
-    }
-}
-```
-
-**Propósito:** Consulta las 5 mejores rachas usando **JPQL** (Java Persistence Query Language).
-
-**Detalles técnicos:**
-- `em.createQuery("SELECT p FROM Partida p ORDER BY p.racha DESC", Partida.class)`: Consulta JPQL
-  - `SELECT p FROM Partida p`: Selecciona objetos `Partida` directamente (no columnas)
-  - `p.racha`: Accede al campo del objeto Java, no a una columna SQL
-- `setMaxResults(5)`: Equivalente a `LIMIT 5` en SQL
-- `getResultList()`: Devuelve `List<Partida>` directamente (no hay mapeo manual)
-
-### Método `obtenerMejorRacha(String nombre)`
-
-```java
-@Override
-public int obtenerMejorRacha(String nombre) {
-    EntityManager em = ObjectDBManager.obtenerConexion();
-    try {
-        TypedQuery<Integer> q = em.createQuery(
-            "SELECT MAX(p.racha) FROM Partida p WHERE p.nombre = ?1", Integer.class);
-        q.setParameter(1, nombre);
-        Integer r = q.getSingleResult();
-        return r != null ? r : 0;
-    } finally {
-        em.close();
-    }
-}
-```
-
-**Propósito:** Obtiene la racha máxima de un jugador usando JPQL.
-
-**Detalles técnicos:**
-- `SELECT MAX(p.racha) FROM Partida p WHERE p.nombre = ?1`: JPQL con función de agregación
-- `?1`: Parámetro posicional (similar a `?` en PreparedStatement)
-- `q.setParameter(1, nombre)`: Asigna el valor del parámetro
-- `getSingleResult()`: Devuelve un único resultado (Integer)
-
-### Comparación con SQL
-
-| Aspecto | SQL (SQLite) | JPQL (ObjectDB) |
-|---------|-------------|-----------------|
-| Selección | `SELECT nombre, racha FROM ranking` | `SELECT p FROM Partida p` |
-| Objeto devuelto | `ResultSet` (filas) → mapeo manual | `Partida` directamente |
-| Parámetros | `WHERE nombre = ?` (posicional) | `WHERE p.nombre = ?1` (posicional nombrado) |
-| Límite | `LIMIT 5` | `setMaxResults(5)` |
-| Agregación | `SELECT MAX(racha) FROM ranking` | `SELECT MAX(p.racha) FROM Partida p` |
-
 ---
 
 ## database.ConexionDB — Conexión a SQLite
@@ -1031,63 +803,6 @@ public static void crearTabla() {
 
 ---
 
-## database.ObjectDBManager — Conexión a ObjectDB
-
-**Rol:** Clase utilitaria que proporciona acceso a ObjectDB (OODBMS) mediante JPA. Gestiona el ciclo de vida del `EntityManagerFactory`.
-
-### Campo
-
-```java
-private static final String RUTA = "ranking.odb";
-private static EntityManagerFactory emf;
-```
-
-**Significado:**
-- `RUTA`: Nombre del archivo de base de datos ObjectDB (`ranking.odb`)
-- `EntityManagerFactory`: Fábrica de `EntityManager`, similar a `DataSource` en JDBC
-
-### Método `obtenerConexion()`
-
-```java
-public static EntityManager obtenerConexion() {
-    if (emf == null) {
-        emf = Persistence.createEntityManagerFactory(RUTA);
-    }
-    return emf.createEntityManager();
-}
-```
-
-**Propósito:** Devuelve un `EntityManager` (similar a `Connection` en JDBC) para operaciones de persistencia.
-
-- `Persistence.createEntityManagerFactory(RUTA)`: Lee el archivo `META-INF/persistence.xml` para configurar la conexión
-- `emf.createEntityManager()`: Crea un `EntityManager` para cada operación
-
-### Método `cerrar()`
-
-```java
-public static void cerrar() {
-    if (emf != null) emf.close();
-}
-```
-
-Libera los recursos del `EntityManagerFactory` al cerrar la aplicación.
-
-### Archivo `persistence.xml`
-
-```xml
-<persistence-unit name="ranking.odb">
-    <class>model.Partida</class>
-    <properties>
-        <property name="javax.persistence.jdbc.url" value="ranking.odb"/>
-    </properties>
-</persistence-unit>
-```
-
-**Significado:**
-- `persistence-unit name="ranking.odb"`: Nombre de la unidad de persistencia, coincide con `RUTA`
-- `class>model.Partida</class>`: Registra la entidad JPA
-- `javax.persistence.jdbc.url`: Ruta del archivo de base de datos ObjectDB
-
 ---
 
 ## service.RankingService — Capa de negocio
@@ -1110,22 +825,9 @@ public RankingService(RankingDAO dao) {
 ```
 
 **Significado:**
-- Constructor sin parámetros: Usa SQLite por defecto (comportamiento original)
-- Constructor con `RankingDAO`: Permite inyectar cualquier implementación (SQLite, ObjectDB o Serialización)
-- El mensaje en consola muestra qué DAO se está usando, útil para verificar el intercambio
-
-Gracias a programar contra la interfaz `RankingDAO`, se puede cambiar de SGBD sin modificar el servicio:
-
-```java
-// Con SQLite (por defecto):
-RankingService svc = new RankingService();
-
-// Con ObjectDB:
-RankingService svc = new RankingService(new RankingObjectDBDAO());
-
-// Con serialización:
-RankingService svc = new RankingService(new RankingSerialDAO());
-```
+- Constructor sin parámetros: Usa SQLite por defecto
+- Constructor con `RankingDAO`: Permite inyectar cualquier implementación de `RankingDAO`
+- El mensaje en consola muestra qué DAO se está usando
 
 ### Método `guardarRecord(String nombre, int racha)`
 
@@ -1183,7 +885,7 @@ public ListaResultados<Partida> obtenerRanking() {
 
 ## service.ClasificadorSGBD — Clasificación de SGBD
 
-**Rol:** Clase que clasifica, analiza y compara los tres sistemas de persistencia utilizados en el proyecto. Satisface el criterio de identificación y evaluación de distintos métodos soportados por los sistemas gestores.
+**Rol:** Clase que clasifica y analiza SQLite como sistema de persistencia relacional utilizado en el proyecto.
 
 ### Método `analizar()`
 
@@ -1191,66 +893,21 @@ public ListaResultados<Partida> obtenerRanking() {
 public static void analizar() {
 ```
 
-Se llama al arrancar la aplicación desde `Main.start()`. Imprime por consola un informe detallado con:
+Se llama al arrancar la aplicación desde `Main.start()`. Imprime por consola la ficha descriptiva de SQLite.
 
-### 1. SQLite (SGBDR)
+### SQLite (SGBDR)
 
 ```
+--- SQLite (JDBC) ---
 Tipo:          Sistema Gestor de Bases de Datos Relacional (SGBDR)
 Método acceso: JDBC (Java Database Connectivity)
 API:           Statement, PreparedStatement, ResultSet
 Formato:       SQL (Structured Query Language)
 Archivo:       ranking.db
-Ventaja:       Lenguaje de consulta estandarizado (SQL). ACID, joins, índices.
-Desventaja:    Esquema rígido. Requiere mapeo objeto-relacional manual.
-```
-
-Uso en el proyecto: `RankingSQLiteDAO`.
-
-### 2. ObjectDB (OODBMS)
-
-```
-Tipo:          Sistema Gestor de Bases de Datos Orientado a Objetos (OODBMS)
-Método acceso: JPA (Java Persistence API) con EntityManager
-API:           EntityManager, TypedQuery, anotaciones @Entity
-Formato:       JPQL (Java Persistence Query Language) — trabaja con objetos Java
-Archivo:       ranking.odb
-Ventaja:       Almacena objetos Java directamente sin mapeo.
-               Anotaciones JPA definen la persistencia. ACID y consultas JPQL.
-Desventaja:    Requiere librería externa (ObjectDB). Menos conocido que SQL.
-```
-
-Uso en el proyecto: `RankingObjectDBDAO`.
-
-### 3. Serialización Java
-
-```
-Tipo:          Persistencia basada en ficheros binarios (no es SGBD formal)
-Método acceso: Serialización/Deserialización con ObjectStreams
-API:           ObjectOutputStream, ObjectInputStream
-Formato:       Binario (formato propio de Java)
-Archivo:       ranking_oo.dat
-Ventaja:       Extremadamente simple. No requiere dependencias externas.
-Desventaja:    Sin lenguaje de consulta. Sin transacciones reales. Sin concurrencia.
-```
-
-Uso en el proyecto: `RankingSerialDAO`.
-
-### Tabla comparativa
-
-La clase también imprime una tabla comparativa final:
-
-```
-CRITERIO      | SQLite          | ObjectDB         | Serialización
---------------|-----------------|------------------|------------------
-Tipo          | Relacional      | Orientado a Obj. | Fichero binario
-Lenguaje      | SQL             | JPQL (JPA)       | N/A
-Almacenamiento| ranking.db      | ranking.odb      | ranking_oo.dat
-Persistencia  | Tablas y filas  | Objetos directos | Flujo de objetos
-Transacciones | ACID (JDBC)     | ACID (JPA)       | No
-Consultas     | SELECT/WHERE    | JPQL/Criteria    | Streams en memoria
-Esquema       | Fijo (tablas)   | Dinámico         | Dinámico
-Acceso concur. | Sí (bloqueos)  | Sí (bloqueos)    | No
+Ventaja:       Lenguaje de consulta estandarizado (SQL).
+              Soporta transacciones ACID, joins, índices.
+Desventaja:    Esquema rígido (tablas definidas). Requiere mapeo
+              objeto-relacional manual (cada fila → objeto Partida).
 ```
 
 ---
@@ -1295,13 +952,11 @@ La pseudo-clase `:hover` cambia el texto a negro cuando el ratón está sobre el
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class BackendTest {
     private static RankingSQLiteDAO sqlite;
-    private static RankingSerialDAO serial;
 
     @BeforeAll
     static void setup() {
         ConexionDB.crearTabla();
         sqlite = new RankingSQLiteDAO();
-        serial = new RankingSerialDAO();
         try (var c = ConexionDB.obtenerConexion();
              var st = c.createStatement()) {
             st.execute("DELETE FROM ranking");
@@ -1359,24 +1014,10 @@ void testSQLiteTop5Ordenado() {
 
 Inserta 6 partidas y verifica que solo devuelve 5 y que están ordenadas de mayor a menor racha.
 
-### testSerialInsertarYRecuperar
-
-```java
-@Test @Order(4)
-void testSerialInsertarYRecuperar() {
-    serial.insertar(new Partida("Serial1", 7));
-    List<Partida> ranking = serial.obtenerTop5();
-    assertTrue(ranking.stream().anyMatch(
-        p -> p.getNombre().equals("Serial1") && p.getRacha() == 7));
-}
-```
-
-Verifica el mismo comportamiento con `RankingSerialDAO`.
-
 ### testService
 
 ```java
-@Test @Order(5)
+@Test @Order(4)
 void testService() {
     RankingService svc = new RankingService();
     svc.guardarRecord("Service1", 3);
@@ -1454,9 +1095,6 @@ Main (app)
   ├──► ConexionDB (database)
   │       └── JDBC → SQLite
   │
-  ├──► ObjectDBManager (database)
-  │       └── JPA → ObjectDB
-  │
   ├──► MusicManager (controller)
   │       └── JavaFX MediaPlayer → WAV
   │
@@ -1466,23 +1104,16 @@ Main (app)
           │       │
           │       └──► RankingDAO (interfaz - dao)
           │               │
-          │               ├──► RankingSQLiteDAO (SGBDR)
-          │               │       └──► ConexionDB
-          │               │
-          │               ├──► RankingObjectDBDAO (OODBMS)
-          │               │       └──► ObjectDBManager
-          │               │
-          │               └──► RankingSerialDAO (fichero binario)
-          │                       └── ObjectStreams → ranking_oo.dat
+          │               └──► RankingSQLiteDAO (SGBDR)
+          │                       └──► ConexionDB
           │
           └──► Modelos (model)
-                  ├── Partida (@Entity, Serializable)
+                  ├── Partida
                   └── ListaResultados<T extends Partida>
 
 BackendTest (test)
   ├──► ConexionDB
   ├──► RankingSQLiteDAO
-  ├──► RankingSerialDAO
   └──► RankingService
 ```
 
@@ -1491,8 +1122,7 @@ BackendTest (test)
 - `Main` → `ClasificadorSGBD.analizar()`: Se llama al arranque para mostrar la clasificación de SGBD
 - `JuegoController` → `RankingService` (composición): El controlador usa el servicio para persistencia
 - `RankingService` → `RankingDAO` (interfaz): Programación contra interfaz, no contra implementación
-- `RankingSQLiteDAO`, `RankingObjectDBDAO` y `RankingSerialDAO` → `RankingDAO` (implementación): Tres estrategias de persistencia intercambiables (SGBDR, OODBMS, fichero)
+- `RankingSQLiteDAO` → `RankingDAO` (implementación): Persistencia con SQLite mediante JDBC
 - `ConexionDB` es utilitaria y usada por `RankingSQLiteDAO` y los tests
-- `ObjectDBManager` es utilitaria y usada por `RankingObjectDBDAO`
-- `Partida` es el modelo de datos compartido entre todas las capas, ahora con anotaciones JPA (`@Entity`)
+- `Partida` es el modelo de datos compartido entre todas las capas
 - `ListaResultados` es el contenedor genérico usado por `RankingService`

@@ -10,13 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class BackendTest {
 
     private static RankingSQLiteDAO sqlite;
-    private static RankingSerialDAO serial;
 
     @BeforeAll
     static void setup() {
         ConexionDB.crearTabla();
         sqlite = new RankingSQLiteDAO();
-        serial = new RankingSerialDAO();
         try (var c = ConexionDB.obtenerConexion();
              var st = c.createStatement()) {
             st.execute("DELETE FROM ranking");
@@ -48,13 +46,6 @@ class BackendTest {
     }
 
     @Test @Order(4)
-    void testSerialInsertarYRecuperar() {
-        serial.insertar(new Partida("Serial1", 7));
-        List<Partida> ranking = serial.obtenerTop5();
-        assertTrue(ranking.stream().anyMatch(p -> p.getNombre().equals("Serial1") && p.getRacha() == 7));
-    }
-
-    @Test @Order(5)
     void testService() {
         RankingService svc = new RankingService();
         svc.guardarRecord("Service1", 3);
