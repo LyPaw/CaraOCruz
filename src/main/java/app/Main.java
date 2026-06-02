@@ -7,6 +7,7 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.HBox;
@@ -50,6 +51,10 @@ public class Main extends Application {
 
         StackPane moneda = new StackPane(circulo, estrella, cruzFig);
 
+        Label rachaLabel = new Label("Racha: 0");
+        rachaLabel.setStyle("-fx-text-fill:white;-fx-font-size:24;-fx-font-weight:bold;" +
+                "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.8),4,0,0,2);");
+
         Button cara = new Button("CARA");
         cara.setStyle("-fx-base:#2E7D32;-fx-font-size:14;-fx-padding:10 28;");
 
@@ -70,7 +75,7 @@ public class Main extends Application {
         String nombre = System.getProperty("player.name", "Jugador");
         System.out.printf("Bienvenido %s! Consigue la racha mas larga posible!%n", nombre);
 
-        JuegoController ctrl = new JuegoController(moneda, estrella, cruzFig, ranking, cara, cruz, verR, nombre);
+        JuegoController ctrl = new JuegoController(moneda, estrella, cruzFig, ranking, cara, cruz, verR, nombre, rachaLabel);
         cara.setOnAction(e -> ctrl.jugar("CARA"));
         cruz.setOnAction(e -> ctrl.jugar("CRUZ"));
         verR.setOnAction(e -> ctrl.mostrarRanking());
@@ -78,7 +83,7 @@ public class Main extends Application {
         HBox filaBotones = new HBox(12, cara, verR, cruz);
         filaBotones.setAlignment(Pos.CENTER);
 
-        VBox raiz = new VBox(22, moneda, filaBotones, ranking);
+        VBox raiz = new VBox(22, rachaLabel, moneda, filaBotones, ranking);
         raiz.setAlignment(Pos.CENTER);
         raiz.setStyle("-fx-padding:40;-fx-background-color:linear-gradient(to bottom,#1A237E,#283593);");
 

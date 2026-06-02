@@ -4,6 +4,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
@@ -17,6 +18,7 @@ public class JuegoController {
     private final StackPane moneda;
     private final ImageView estrella, cruzFig;
     private final ListView<String> ranking;
+    private final Label rachaLabel;
     private final Button cara, cruz, verR;
     private final String nombre;
     private final Random rand = new Random();
@@ -26,10 +28,10 @@ public class JuegoController {
 
     public JuegoController(StackPane moneda, ImageView estrella, ImageView cruzFig,
                            ListView<String> ranking, Button cara, Button cruz,
-                           Button verR, String nombre) {
+                           Button verR, String nombre, Label rachaLabel) {
         this.moneda = moneda; this.estrella = estrella; this.cruzFig = cruzFig;
         this.ranking = ranking; this.cara = cara; this.cruz = cruz;
-        this.verR = verR; this.nombre = nombre;
+        this.verR = verR; this.nombre = nombre; this.rachaLabel = rachaLabel;
     }
 
     public void jugar(String eleccion) {
@@ -67,6 +69,7 @@ public class JuegoController {
                     if (rachaActual > 0) service.guardarSiMejor(nombre, rachaActual);
                     rachaActual = 0;
                 }
+                rachaLabel.setText("Racha: " + rachaActual);
                 System.out.printf("[%s] %s -> %s %s (racha:%d)%n", nombre, eleccion, resultado, ok ? "OK" : "X", rachaActual);
                 ranking.getItems().setAll(service.obtenerRanking().getItems().stream()
                     .map(p -> String.format("%s - %d", p.getNombre(), p.getRacha())).toList());
