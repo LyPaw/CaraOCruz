@@ -36,45 +36,21 @@ public class JuegoController {
 
     public void jugar(String eleccion) {
         if (animando) return;
-        animando = true;
-        cara.setDisable(true); cruz.setDisable(true);
+        bloquearBotones();
 
-        String resultado = rand.nextBoolean() ? "CARA" : "CRUZ";
+        String resultado = generarResultado();
 
-        ScaleTransition squish = new ScaleTransition(Duration.millis(600), moneda);
-        squish.setToY(0.01);
-
-        Timeline spin = new Timeline();
-        for (int i = 0; i < 10; i++) {
-            boolean mostrar = i % 2 == 0;
-            spin.getKeyFrames().add(new KeyFrame(Duration.millis(65 * i), e -> {
-                estrella.setVisible(mostrar);
-                cruzFig.setVisible(!mostrar);
-            }));
-        }
+        ScaleTransition squish = crearAnimacionSquish();
+        Timeline spin = crearAnimacionSpin();
 
         spin.setOnFinished(e -> {
             squish.stop();
-            boolean ok = eleccion.equals(resultado);
-            estrella.setVisible(resultado.equals("CARA"));
-            cruzFig.setVisible(resultado.equals("CRUZ"));
-            moneda.setEffect(new DropShadow(15, 3, 3, ok ? Color.web("#4CAF50", 0.6) : Color.web("#F44336", 0.6)));
+            boolean ok = evaluarYMostrarResultado(resultado, eleccion);
 
-            ScaleTransition expand = new ScaleTransition(Duration.millis(300), moneda);
-            expand.setToY(1);
-            expand.setOnFinished(e2 -> {
-                if (ok) {
-                    rachaActual++;
-                } else {
-                    if (rachaActual > 0) service.guardarSiMejor(nombre, rachaActual);
-                    rachaActual = 0;
-                }
-                rachaLabel.setText("Racha: " + rachaActual);
-                System.out.printf("[%s] %s -> %s %s (racha:%d)%n", nombre, eleccion, resultado, ok ? "OK" : "X", rachaActual);
-                ranking.getItems().setAll(service.obtenerRanking().getItems().stream()
-                    .map(p -> String.format("%s - %d", p.getNombre(), p.getRacha())).toList());
-                cara.setDisable(false); cruz.setDisable(false);
-                animando = false;
+            ScaleTransition expand = crearAnimacionExpand(() -> {
+                procesarResultado(ok);
+                actualizarInterfaz(resultado, eleccion, ok);
+                desbloquearBotones();
             });
             expand.play();
         });
@@ -89,6 +65,76 @@ public class JuegoController {
         lr.getItems().forEach(p -> sb.append(String.format("%-18s %d racha%n", p.getNombre(), p.getRacha())));
         System.out.print(sb);
         ranking.getItems().setAll(lr.getItems().stream()
+            .map(p -> String.format("%s - %d", p.getNombre(), p.getRacha())).toList());
+    }
+
+    private void bloquearBotones() {
+        animando = true;
+        cara.setDisable(true);
+        cruz.setDisable(true);
+    }
+
+    private void desbloquearBotones() {
+        cara.setDisable(false);
+        cruz.setDisable(false);
+        animando = false;
+    }
+
+    private String generarResultado() {
+        return rand.nextBoolean() ? "CARA" : "CRUZ";
+    }
+
+    private ScaleTransition crearAnimacionSquish() {
+        ScaleTransition s = new ScaleTransition(Duration.millis(600), moneda);
+        s.setToY(0.01);
+        return s;
+    }
+
+    private Timeline crearAnimacionSpin() {
+        Timeline t = new Timeline();
+        for (int i = 0; i < 10; i++) {
+            boolean mostrar = i % 2 == 0;
+            t.getKeyFrames().add(new KeyFrame(Duration.millis(65 * i), e -> {
+                estrella.setVisible(mostrar);
+                cruzFig.setVisible(!mostrar);
+            }));
+        }
+        return t;
+    }
+
+    private boolean evaluarYMostrarResultado(String resultado, String eleccion) {
+        boolean ok = eleccion.equals(resultado);
+        estrella.setVisible(resultado.equals("CARA"));
+        cruzFig.setVisible(resultado.equals("CRUZ"));
+        aplicarSombraResultado(ok);
+        return ok;
+    }
+
+    private void aplicarSombraResultado(boolean ok) {
+        Color c = ok ? Color.web("#4CAF50", 0.6) : Color.web("#F44336", 0.6);
+        moneda.setEffect(new DropShadow(15, 3, 3, c));
+    }
+
+    private ScaleTransition crearAnimacionExpand(Runnable callback) {
+        ScaleTransition s = new ScaleTransition(Duration.millis(300), moneda);
+        s.setToY(1);
+        s.setOnFinished(e -> callback.run());
+        return s;
+    }
+
+    private void procesarResultado(boolean ok) {
+        if (ok) {
+            rachaActual++;
+        } else {
+            if (rachaActual > 0) service.guardarSiMejor(nombre, rachaActual);
+            rachaActual = 0;
+        }
+    }
+
+    private void actualizarInterfaz(String resultado, String eleccion, boolean ok) {
+        rachaLabel.setText("Racha: " + rachaActual);
+        System.out.printf("[%s] %s -> %s %s (racha:%d)%n", nombre, eleccion, resultado, ok ? "OK" : "X", rachaActual);
+        ranking.getItems().setAll(service.obtenerRanking().getItems().stream()
             .map(p -> String.format("%s - %d", p.getNombre(), p.getRacha())).toList());
     }
 }
