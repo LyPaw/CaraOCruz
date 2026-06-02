@@ -14,11 +14,8 @@
 | `src/main/java/model/ListaResultados.java` | 16 |
 | `src/main/java/model/Partida.java` | 16 |
 | `src/main/java/service/RankingService.java` | 31 |
-| `src/main/resources/css/estilo.css` | 9 |
 | `src/test/java/BackendTest.java` | 63 |
-| `pom.xml` | 143 |
-| `README.md` | 86 |
-| **Total** | **1869** |
+| **Total** | **459** |
 
 ## Índice
 
