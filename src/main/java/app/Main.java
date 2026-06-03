@@ -5,19 +5,13 @@ import controller.MusicManager;
 import database.ConexionDB;
 import service.ClasificadorSGBD;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.RadialGradient;
-import javafx.scene.paint.Stop;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Circle;
@@ -32,16 +26,8 @@ public class Main extends Application {
         MusicManager.iniciar();
         ClasificadorSGBD.analizar();
 
-        RadialGradient oro = new RadialGradient(0, 0.5, 0.5, 0.5, 0.5, true, CycleMethod.NO_CYCLE,
-                new Stop(0, Color.web("#8D8877")),
-                new Stop(0.3, Color.web("#676452")),
-                new Stop(0.7, Color.web("#474639")),
-                new Stop(1, Color.web("#212118")));
-
-        Circle circulo = new Circle(160, oro);
-        circulo.setStroke(Color.web("#1e2014"));
-        circulo.setStrokeWidth(5);
-        circulo.setEffect(new DropShadow(25, 7, 7, Color.rgb(30, 30, 25, 0.6)));
+        Circle circulo = new Circle(160);
+        circulo.getStyleClass().add("moneda-circulo");
 
         Image imgCara = new Image(getClass().getResourceAsStream("/img/cara.png"));
         Image imgCruz = new Image(getClass().getResourceAsStream("/img/cruz.png"));
@@ -54,25 +40,20 @@ public class Main extends Application {
         StackPane moneda = new StackPane(circulo, estrella, cruzFig);
 
         Label rachaLabel = new Label("Racha: 0");
-        rachaLabel.setStyle("-fx-text-fill:white;-fx-font-size:24;-fx-font-weight:bold;" +
-                "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.8),4,0,0,2);");
+        rachaLabel.getStyleClass().add("racha-label");
 
         Button cara = new Button("CARA");
-        cara.setStyle("-fx-base:#2E7D32;-fx-font-size:14;-fx-padding:10 28;");
+        cara.getStyleClass().addAll("boton-juego", "btn-cara");
 
         Button verR = new Button("VER RANKING");
-        verR.setStyle("-fx-base:#1565C0;-fx-font-size:13;-fx-padding:10 16;");
+        verR.getStyleClass().addAll("boton-juego", "btn-ranking");
 
         Button cruz = new Button("CRUZ");
-        cruz.setStyle("-fx-base:#C62828;-fx-font-size:14;-fx-padding:10 28;");
-
-        for (Button b : new Button[]{cara, verR, cruz}) b.getStyleClass().add("boton-juego");
+        cruz.getStyleClass().addAll("boton-juego", "btn-cruz");
 
         ListView<String> ranking = new ListView<>();
         ranking.setPrefHeight(200);
-        ranking.setStyle("-fx-control-inner-background:#0D1B3E;-fx-text-fill:white;" +
-                "-fx-font-size:13;-fx-font-family:Consolas;" +
-                "-fx-background-radius:8;");
+        ranking.getStyleClass().add("ranking-list");
 
         String nombre = System.getProperty("player.name", "Jugador");
         System.out.printf("Bienvenido %s! Consigue la racha mas larga posible!%n", nombre);
@@ -83,11 +64,9 @@ public class Main extends Application {
         verR.setOnAction(e -> ctrl.mostrarRanking());
 
         HBox filaBotones = new HBox(12, cara, verR, cruz);
-        filaBotones.setAlignment(Pos.CENTER);
-
+        filaBotones.getStyleClass().add("fila-botones");
         VBox raiz = new VBox(22, rachaLabel, moneda, filaBotones, ranking);
-        raiz.setAlignment(Pos.CENTER);
-        raiz.setStyle("-fx-padding:40;-fx-background-color:linear-gradient(to bottom,#1A237E,#283593);");
+        raiz.getStyleClass().add("root-panel");
 
         Scene escena = new Scene(raiz, 500, 600);
         escena.getStylesheets().add(getClass().getResource("/css/estilo.css").toExternalForm());

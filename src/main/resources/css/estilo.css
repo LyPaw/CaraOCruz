@@ -7,3 +7,91 @@
 .boton-juego:hover {
     -fx-text-fill: black;
 }
+
+.moneda-circulo {
+    -fx-fill: radial-gradient(focus-angle 0deg, focus-distance 0%, center 50% 50%, radius 50%, #8D8877 0%, #676452 30%, #474639 70%, #212118 100%);
+    -fx-stroke: #1e2014;
+    -fx-stroke-width: 5;
+    -fx-effect: dropshadow(gaussian, rgba(30,30,25,0.6), 25, 0, 7, 7);
+}
+
+.racha-label {
+    -fx-text-fill: white;
+    -fx-font-size: 24;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0, 0, 2);
+}
+
+.btn-cara {
+    -fx-base: #2E7D32;
+    -fx-font-size: 14;
+    -fx-padding: 10 28;
+}
+
+.btn-ranking {
+    -fx-base: #1565C0;
+    -fx-font-size: 13;
+    -fx-padding: 10 16;
+}
+
+.btn-cruz {
+    -fx-base: #C62828;
+    -fx-font-size: 14;
+    -fx-padding: 10 28;
+}
+
+.ranking-list {
+    -fx-control-inner-background: #0D1B3E;
+    -fx-background-color: #0D1B3E;
+    -fx-background-radius: 10;
+    -fx-border-color: #4A5CB8;
+    -fx-border-radius: 10;
+    -fx-border-width: 2;
+    -fx-padding: 4;
+}
+
+.ranking-list .list-cell {
+    -fx-text-fill: #E0E0FF;
+    -fx-font-size: 16;
+    -fx-font-family: Consolas;
+    -fx-alignment: center;
+    -fx-padding: 6 10;
+    -fx-background-color: transparent;
+}
+
+.ranking-list .list-cell:odd {
+    -fx-background-color: rgba(74, 92, 184, 0.15);
+}
+
+.ranking-list .list-cell:hover {
+    -fx-background-color: rgba(74, 92, 184, 0.3);
+}
+
+.ranking-list .list-cell:selected {
+    -fx-background-color: #4A5CB8;
+    -fx-text-fill: white;
+}
+
+.ranking-list .scroll-bar:vertical {
+    -fx-background-color: #0A1530;
+    -fx-background-radius: 0 10 10 0;
+}
+
+.ranking-list .scroll-bar:vertical .thumb {
+    -fx-background-color: #3A4BA0;
+    -fx-background-radius: 4;
+}
+
+.ranking-list .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.root-panel {
+    -fx-padding: 40;
+    -fx-alignment: center;
+    -fx-background-color: linear-gradient(to bottom, #1A237E, #283593);
+}
+
+.fila-botones {
+    -fx-alignment: center;
+}

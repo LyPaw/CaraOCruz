@@ -14,8 +14,6 @@ Juego de **Cara o Cruz** (heads or tails) desarrollado en **JavaFX**. El jugador
 - **Interfaz gráfica completa (JavaFX)** — Pantalla completa, botones con estilos, sombras dinámicas que cambian de color según acierto o fallo
 - **Entrada por consola** — El nombre del jugador se solicita al arrancar mediante `Scanner`
 - **Salida formateada** — Uso de `printf` y `String.format` para mostrar resultados y ranking con formato tabulado
-- **Genéricos** — Clase `ListaResultados<T extends Partida>` con método genérico `sumar(ToIntFunction<? super T>)`
-- **Streams y operaciones agregadas** — `stream().mapToInt().sum()`, `stream().sorted().limit(5).collect()`, `stream().filter().mapToInt().max()`, `stream().map().toList()` en múltiples archivos
 - **Arquitectura basada en interfaces** — `RankingDAO` define el contrato de persistencia con implementación en SQLite mediante JDBC
 - **Base de datos SQLite (SGBDR)** — Persistencia mediante JDBC con tabla `ranking` (id, nombre, racha). La tabla se crea automáticamente al iniciar
 - **Clasificador de SGBD** — Al arrancar la aplicación, `ClasificadorSGBD` imprime por consola un análisis de SQLite como sistema de persistencia
@@ -51,7 +49,6 @@ src/main/java/
 ├── database/
 │   └── ConexionDB.java                 ← Conexión JDBC a SQLite
 ├── model/
-│   ├── ListaResultados.java            ← Contenedor genérico con operaciones agregadas
 │   └── Partida.java                    ← Modelo de datos
 └── service/
     ├── ClasificadorSGBD.java           ← Clasificación de sistemas de persistencia

@@ -2,13 +2,14 @@ package service;
 
 import dao.RankingDAO;
 import dao.RankingSQLiteDAO;
-import model.ListaResultados;
 import model.Partida;
+import java.util.List;
 
 public class RankingService {
     private final RankingDAO dao;
 
     public RankingService() {
+
         this(new RankingSQLiteDAO());
     }
 
@@ -31,10 +32,7 @@ public class RankingService {
         return dao.obtenerMejorRacha(nombre);
     }
 
-    public ListaResultados<Partida> obtenerRanking() {
-        ListaResultados<Partida> lr = new ListaResultados<>();
-        dao.obtenerTop5().forEach(lr::añadir);
-        System.out.println("Suma total de rachas TOP5: " + lr.sumar(Partida::getRacha));
-        return lr;
+    public List<Partida> obtenerRanking() {
+        return dao.obtenerTop5();
     }
 }

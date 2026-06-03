@@ -11,7 +11,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
+import model.Partida;
 import service.RankingService;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class JuegoController {
@@ -60,12 +62,17 @@ public class JuegoController {
     }
 
     public void mostrarRanking() {
-        var lr = service.obtenerRanking();
+        var rankingList = service.obtenerRanking();
         StringBuilder sb = new StringBuilder("=== TOP 5 RANKING ===\n");
-        lr.getItems().forEach(p -> sb.append(String.format("%-18s %d racha%n", p.getNombre(), p.getRacha())));
+        for (Partida p : rankingList) {
+            sb.append(String.format("%-18s %d racha%n", p.getNombre(), p.getRacha()));
+        }
         System.out.print(sb);
-        ranking.getItems().setAll(lr.getItems().stream()
-            .map(p -> String.format("%s - %d", p.getNombre(), p.getRacha())).toList());
+        ArrayList<String> items = new ArrayList<>();
+        for (Partida p : rankingList) {
+            items.add(String.format("%s - %d", p.getNombre(), p.getRacha()));
+        }
+        ranking.getItems().setAll(items);
     }
 
     private void bloquearBotones() {
@@ -134,7 +141,10 @@ public class JuegoController {
     private void actualizarInterfaz(String resultado, String eleccion, boolean ok) {
         rachaLabel.setText("Racha: " + rachaActual);
         System.out.printf("[%s] %s -> %s %s (racha:%d)%n", nombre, eleccion, resultado, ok ? "OK" : "X", rachaActual);
-        ranking.getItems().setAll(service.obtenerRanking().getItems().stream()
-            .map(p -> String.format("%s - %d", p.getNombre(), p.getRacha())).toList());
+        ArrayList<String> items = new ArrayList<>();
+        for (Partida p : service.obtenerRanking()) {
+            items.add(String.format("%s - %d", p.getNombre(), p.getRacha()));
+        }
+        ranking.getItems().setAll(items);
     }
 }

@@ -32,7 +32,11 @@ class BackendTest {
     void testSQLiteInsertarYRecuperar() {
         sqlite.insertar(new Partida("Test1", 10));
         List<Partida> ranking = sqlite.obtenerTop5();
-        assertTrue(ranking.stream().anyMatch(p -> p.getNombre().equals("Test1") && p.getRacha() == 10));
+        boolean encontrado = false;
+        for (Partida p : ranking) {
+            if (p.getNombre().equals("Test1") && p.getRacha() == 10) encontrado = true;
+        }
+        assertTrue(encontrado);
     }
 
     @Test @Order(3)
@@ -49,6 +53,11 @@ class BackendTest {
     void testService() {
         RankingService svc = new RankingService();
         svc.guardarRecord("Service1", 3);
-        assertTrue(svc.obtenerRanking().getItems().stream().anyMatch(p -> p.getNombre().equals("Service1")));
+        var ranking = svc.obtenerRanking();
+        boolean encontrado = false;
+        for (Partida p : ranking) {
+            if (p.getNombre().equals("Service1")) encontrado = true;
+        }
+        assertTrue(encontrado);
     }
 }

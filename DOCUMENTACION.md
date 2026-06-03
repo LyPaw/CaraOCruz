@@ -10,12 +10,11 @@
 | `src/main/java/dao/RankingDAO.java` | 10 |
 | `src/main/java/dao/RankingSQLiteDAO.java` | 41 |
 | `src/main/java/database/ConexionDB.java` | 20 |
-| `src/main/java/model/ListaResultados.java` | 16 |
 | `src/main/java/model/Partida.java` | 21 |
 | `src/main/java/service/RankingService.java` | 33 |
 | `src/main/java/service/ClasificadorSGBD.java` | 28 |
 | `src/test/java/BackendTest.java` | 54 |
-| **Total** | **477** |
+| **Total** | **461** |
 
 ## Índice
 
@@ -25,8 +24,7 @@
 4. [controller.JuegoController — Lógica del juego](#controllerjuegocontroller--lógica-del-juego)
 5. [controller.MusicManager — Música de fondo](#controllermusicmanager--música-de-fondo)
 6. [model.Partida — Modelo de datos](#modelpartida--modelo-de-datos)
-7. [model.ListaResultados — Contenedor genérico](#modellistaresultados--contenedor-genérico)
-8. [dao.RankingDAO — Interfaz de persistencia](#daorankingdao--interfaz-de-persistencia)
+7. [dao.RankingDAO — Interfaz de persistencia](#daorankingdao--interfaz-de-persistencia)
 9. [dao.RankingSQLiteDAO — Implementación SQLite](#daorankingsqlitedao--implementación-sqlite)
 10. [database.ConexionDB — Conexión a SQLite](#databaseconexiondb--conexión-a-sqlite)
 11. [service.RankingService — Capa de negocio](#servicerankingservice--capa-de-negocio)
@@ -55,7 +53,6 @@ src/
 │   │   ├── database/
 │   │   │   └── ConexionDB.java               ← Conexión JDBC a SQLite
 │   │   ├── model/
-│   │   │   ├── ListaResultados.java           ← Colección genérica
 │   │   │   └── Partida.java                   ← Modelo de datos
 │   │   └── service/
 │   │       ├── RankingService.java            ← Lógica de negocio
@@ -475,11 +472,11 @@ expand.setOnFinished(e2 -> {
     }
     System.out.printf("[%s] %s -> %s %s (racha:%d)%n",
         nombre, eleccion, resultado, ok ? "OK" : "X", rachaActual);
-    ranking.getItems().setAll(
-        service.obtenerRanking().getItems().stream()
-            .map(p -> String.format("%s - %d", p.getNombre(), p.getRacha()))
-            .toList()
-    );
+    ArrayList<String> items = new ArrayList<>();
+    for (Partida p : service.obtenerRanking()) {
+        items.add(String.format("%s - %d", p.getNombre(), p.getRacha()));
+    }
+    ranking.getItems().setAll(items);
     cara.setDisable(false);
     cruz.setDisable(false);
     animando = false;
@@ -505,26 +502,27 @@ Inicia ambas animaciones simultáneamente: la moneda se comprime verticalmente m
 
 ```java
 public void mostrarRanking() {
-    var lr = service.obtenerRanking();
+    var rankingList = service.obtenerRanking();
     StringBuilder sb = new StringBuilder("=== TOP 5 RANKING ===\n");
-    lr.getItems().forEach(p ->
-        sb.append(String.format("%-18s %d racha%n", p.getNombre(), p.getRacha())));
+    for (Partida p : rankingList) {
+        sb.append(String.format("%-18s %d racha%n", p.getNombre(), p.getRacha()));
+    }
     System.out.print(sb);
-    ranking.getItems().setAll(
-        lr.getItems().stream()
-            .map(p -> String.format("%s - %d", p.getNombre(), p.getRacha()))
-            .toList()
-    );
+    ArrayList<String> items = new ArrayList<>();
+    for (Partida p : rankingList) {
+        items.add(String.format("%s - %d", p.getNombre(), p.getRacha()));
+    }
+    ranking.getItems().setAll(items);
 }
 ```
 
 **Propósito:** Muestra el ranking actual en consola y en la interfaz gráfica.
 
 **Flujo:**
-1. Llama a `service.obtenerRanking()` que devuelve un `ListaResultados<Partida>` con el top 5
+1. Llama a `service.obtenerRanking()` que devuelve una `List<Partida>` con el top 5
 2. Construye un `StringBuilder` con cabecera y cada jugada formateada con ancho fijo `%-18s` para alinear nombres
 3. Imprime el ranking en consola
-4. Actualiza el `ListView<String>` transformando cada `Partida` a texto `"Nombre - Racha"` mediante `stream().map().toList()`
+4. Actualiza el `ListView<String>` recorriendo la lista con un bucle `for`
 
 ---
 
@@ -607,39 +605,6 @@ public class Partida {
 - `id` (Long): Identificador único, generado automáticamente
 - `nombre` (String): Nombre del jugador
 - `racha` (int): Racha de aciertos consecutivos
-
----
-
-## model.ListaResultados — Contenedor genérico
-
-**Rol:** Clase genérica que encapsula una lista de resultados con capacidad de realizar operaciones agregadas.
-
-```java
-public class ListaResultados<T extends Partida> {
-    private final List<T> items = new ArrayList<>();
-
-    public void añadir(T item) { items.add(item); }
-    public List<T> getItems() { return items; }
-
-    public int sumar(ToIntFunction<? super T> extractor) {
-        return items.stream().mapToInt(extractor).sum();
-    }
-}
-```
-
-**Significado de la genericidad:**
-- `<T extends Partida>`: El tipo `T` debe ser `Partida` o una subclase. Esto permite que la lista solo contenga objetos que son partidas (o subtipos), dando seguridad de tipos en compilación
-- `ToIntFunction<? super T>`: Acepta una función que extrae un entero de un objeto de tipo `T` o cualquier superclase. El `? super T` (wildcard contravariante) hace el método más flexible
-
-**Métodos:**
-- `añadir(T item)`: Agrega un elemento a la lista interna
-- `getItems()`: Devuelve la lista completa (no defensiva — se expone directamente)
-- `sumar(ToIntFunction<? super T> extractor)`: Usa `stream().mapToInt().sum()` para sumar todos los valores extraídos de cada elemento. Ejemplo de uso: `lr.sumar(Partida::getRacha)` suma todas las rachas de la lista
-
-**Operaciones agregadas:**
-- `stream()` convierte la lista en un flujo de datos
-- `mapToInt()` transforma cada elemento a un entero usando el extractor
-- `sum()` suma todos los enteros del flujo
 
 ---
 
@@ -861,22 +826,12 @@ public int obtenerMejorRacha(String nombre) {
 ### Método `obtenerRanking()`
 
 ```java
-public ListaResultados<Partida> obtenerRanking() {
-    ListaResultados<Partida> lr = new ListaResultados<>();
-    dao.obtenerTop5().forEach(lr::aadir);
-    System.out.println("Suma total de rachas TOP5: " + lr.sumar(Partida::getRacha));
-    return lr;
+public List<Partida> obtenerRanking() {
+    return dao.obtenerTop5();
 }
 ```
 
-**Propósito:** Obtiene el top 5, lo envuelve en un `ListaResultados` y además muestra por consola la suma total de rachas usando el método genérico `sumar()`.
-
-**Flujo:**
-1. Crea un `ListaResultados<Partida>` vacío
-2. Obtiene el top 5 del DAO y los añade con `forEach(lr::añadir)` (method reference)
-3. Usa `lr.sumar(Partida::getRacha)` para calcular la suma total (operación agregada)
-4. Imprime la suma por consola
-5. Devuelve el `ListaResultados`
+**Propósito:** Obtiene el top 5 directamente del DAO y lo devuelve como `List<Partida>`.
 
 ---
 
@@ -988,8 +943,11 @@ Verifica que el constructor y los getters de `Partida` funcionan correctamente.
 void testSQLiteInsertarYRecuperar() {
     sqlite.insertar(new Partida("Test1", 10));
     List<Partida> ranking = sqlite.obtenerTop5();
-    assertTrue(ranking.stream().anyMatch(
-        p -> p.getNombre().equals("Test1") && p.getRacha() == 10));
+    boolean encontrado = false;
+    for (Partida p : ranking) {
+        if (p.getNombre().equals("Test1") && p.getRacha() == 10) encontrado = true;
+    }
+    assertTrue(encontrado);
 }
 ```
 
@@ -1018,8 +976,12 @@ Inserta 6 partidas y verifica que solo devuelve 5 y que están ordenadas de mayo
 void testService() {
     RankingService svc = new RankingService();
     svc.guardarRecord("Service1", 3);
-    assertTrue(svc.obtenerRanking().getItems().stream()
-        .anyMatch(p -> p.getNombre().equals("Service1")));
+    var ranking = svc.obtenerRanking();
+    boolean encontrado = false;
+    for (Partida p : ranking) {
+        if (p.getNombre().equals("Service1")) encontrado = true;
+    }
+    assertTrue(encontrado);
 }
 ```
 
@@ -1103,10 +1065,8 @@ Main (app)
           │               │
           │               └──► RankingSQLiteDAO (SGBDR)
           │                       └──► ConexionDB
-          │
           └──► Modelos (model)
-                  ├── Partida
-                  └── ListaResultados<T extends Partida>
+                  └── Partida
 
 BackendTest (test)
   ├──► ConexionDB
@@ -1122,4 +1082,3 @@ BackendTest (test)
 - `RankingSQLiteDAO` → `RankingDAO` (implementación): Persistencia con SQLite mediante JDBC
 - `ConexionDB` es utilitaria y usada por `RankingSQLiteDAO` y los tests
 - `Partida` es el modelo de datos compartido entre todas las capas
-- `ListaResultados` es el contenedor genérico usado por `RankingService`
